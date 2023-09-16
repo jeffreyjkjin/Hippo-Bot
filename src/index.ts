@@ -1,18 +1,13 @@
 import { config } from 'dotenv'
-import { Client, GatewayIntentBits } from 'discord.js'
+
+import ExtendedClient from './structures/ExtendedClient'
 
 config();
 
-const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
-    ]
-});
-
-client.login(process.env.TOKEN);
+const client: ExtendedClient = new ExtendedClient();
 
 client.on('ready', () => {
     console.log(`${client.user && client.user.tag} is online!`);
 });
+
+client.login(process.env.TOKEN);
