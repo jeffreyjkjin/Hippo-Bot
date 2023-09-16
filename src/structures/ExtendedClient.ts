@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits } from 'discord.js'
+import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -19,6 +19,7 @@ export default class ExtendedClient extends Client {
         this.commands = new Collection<string, Command>();
 
         this.loadCommands();
+        this.registerCommands();
     }
 
     private loadCommands() {
@@ -34,5 +35,27 @@ export default class ExtendedClient extends Client {
             console.log(`Loading command: ${command.name}`);
             this.commands.set(command.name, command);
         });
+    }
+
+    private async registerCommands() {
+        const rest: REST = new REST().setToken(process.env.TOKEN);
+
+        (async () => {
+            try {
+                await rest.put(
+                    Routes.applicationCommands(process.env.CLIENT_ID), 
+                    // Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), 
+                    { 
+                        body: this.commands.map((command) => { 
+                            console.log(`Registering command: ${command.name}`);
+                            return command.toJSON(); 
+                        })
+                    }
+                );
+            } catch (e) {
+                console.log(e);
+            }
+        })();
+        
     }
 }
