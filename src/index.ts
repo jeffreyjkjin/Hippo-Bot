@@ -1,7 +1,8 @@
-import { CacheType, Interaction } from 'discord.js';
+import { CacheType, Interaction } from 'discord.js'
 import { config } from 'dotenv'
 
-import Command from './structures/Command';
+import Button from './structures/Button'
+import Command from './structures/Command'
 import ExtendedClient from './structures/ExtendedClient'
 
 config();
@@ -21,16 +22,40 @@ client.on('interactionCreate', async (i: Interaction<CacheType>) => {
                 content: `No command matching ${i.commandName} was found.`, 
                 ephemeral: true
             });
+            return;
         }
 
         try {
             await command.execute(i);
-        } catch (e) {
+        } 
+        catch (e) {
             console.error(e);
             await i.followUp({ 
                 content: 'There was an error while executing this command.',
                 ephemeral: true
             });
+        }
+    }
+    else if (i.isButton()) {
+        const button: Button = client.buttons.get(i.customId);
+        
+        if (!button) {
+            await i.followUp({ 
+                content: `No button matching ${i.customId} was found.`, 
+                ephemeral: true
+            });
+            return;
+        }
+
+        try {
+            await button.execute(i);
+        }
+        catch (e) {
+            console.error(e);
+            await i.followUp({ 
+                content: 'There was an error while executing this button.',
+                ephemeral: true
+            });            
         }
     }
 });
