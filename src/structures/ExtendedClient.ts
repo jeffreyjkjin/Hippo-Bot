@@ -2,10 +2,12 @@ import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import Command from './Command';
+import Button from './Button'
+import Command from './Command'
 
 export default class ExtendedClient extends Client {
     commands: Collection<string, Command>;
+    buttons: Collection<string, Button>
 
     constructor() {
         super({
@@ -17,9 +19,11 @@ export default class ExtendedClient extends Client {
         });
 
         this.commands = new Collection<string, Command>();
-
         this.loadCommands();
         this.registerCommands();
+
+        this.buttons = new Collection<string, Button>();
+        this.loadButtons();
     }
 
     private loadCommands() {
@@ -43,8 +47,8 @@ export default class ExtendedClient extends Client {
         (async () => {
             try {
                 await rest.put(
-                    Routes.applicationCommands(process.env.CLIENT_ID), 
-                    // Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), 
+                    // Routes.applicationCommands(process.env.CLIENT_ID), 
+                    Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), 
                     { 
                         body: this.commands.map((command) => { 
                             console.log(`Registering command: ${command.name}`);
@@ -57,5 +61,20 @@ export default class ExtendedClient extends Client {
             }
         })();
         
+    }
+
+    private async loadButtons() {
+        const buttonPath: string = path.join(__dirname, '../buttons');
+        const buttonFiles: string[] = fs.readdirSync(buttonPath).filter((file: string): boolean => { 
+            return file.endsWith('.ts' || '.js'); 
+        });
+
+        buttonFiles.forEach((file: string) => {
+            const filePath: string = path.join(buttonPath, file);
+            const button: Button = require(filePath);
+
+            console.log(`Loading button: ${button.id}`);
+            this.buttons.set(button.id, button);
+        });        
     }
 }
