@@ -4,6 +4,7 @@ import { config } from 'dotenv'
 import Button from './structures/Button'
 import Command from './structures/Command'
 import ExtendedClient from './structures/ExtendedClient'
+import Modal from './structures/Modal'
 
 config();
 
@@ -54,6 +55,29 @@ client.on('interactionCreate', async (i: Interaction<CacheType>) => {
             console.error(e);
             await i.followUp({ 
                 content: 'There was an error while executing this button.',
+                ephemeral: true
+            });            
+        }
+    }
+
+    else if (i.isModalSubmit()) {
+        const modal: Modal = client.modals.get(i.customId);
+
+        if (!modal) {
+            await i.followUp({ 
+                content: `No modal matching ${i.customId} was found.`, 
+                ephemeral: true
+            });
+            return;
+        }
+
+        try {
+            await modal.execute(i);
+        }
+        catch (e) {
+            console.error(e);
+            await i.followUp({ 
+                content: 'There was an error while executing this modal.',
                 ephemeral: true
             });            
         }
