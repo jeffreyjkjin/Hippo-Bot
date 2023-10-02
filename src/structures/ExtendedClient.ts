@@ -4,10 +4,12 @@ import path from 'node:path'
 
 import Button from './Button'
 import Command from './Command'
+import Modal from './Modal'
 
 export default class ExtendedClient extends Client {
     commands: Collection<string, Command>;
-    buttons: Collection<string, Button>
+    buttons: Collection<string, Button>;
+    modals: Collection<string, Modal>;
 
     constructor() {
         super({
@@ -24,6 +26,9 @@ export default class ExtendedClient extends Client {
 
         this.buttons = new Collection<string, Button>();
         this.loadButtons();
+        
+        this.modals = new Collection<string, Modal>();
+        this.loadModals();
     }
 
     private loadCommands() {
@@ -75,6 +80,22 @@ export default class ExtendedClient extends Client {
 
             console.log(`Loading button: ${button.id}`);
             this.buttons.set(button.id, button);
+        });        
+    }
+
+
+    private async loadModals() {
+        const modalPath: string = path.join(__dirname, '../modals');
+        const modalFiles: string[] = fs.readdirSync(modalPath).filter((file: string): boolean => { 
+            return file.endsWith('.ts' || '.js'); 
+        });
+
+        modalFiles.forEach((file: string) => {
+            const filePath: string = path.join(modalPath, file);
+            const modal: Modal = require(filePath);
+
+            console.log(`Loading modal: ${modal.id}`);
+            this.modals.set(modal.id, modal);
         });        
     }
 }
