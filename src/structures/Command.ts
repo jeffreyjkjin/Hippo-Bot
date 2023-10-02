@@ -1,4 +1,4 @@
-import { RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder } from "discord.js";
+import { RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder } from 'discord.js';
 
 export default class Command {
     private data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;

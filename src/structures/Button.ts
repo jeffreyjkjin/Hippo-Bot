@@ -1,5 +1,4 @@
-import { APIButtonComponent } from "discord.js"
-import { ButtonBuilder } from "@discordjs/builders"
+import { ButtonBuilder } from '@discordjs/builders'
 
 export default class Button {
     private data: ButtonBuilder;
@@ -11,9 +10,5 @@ export default class Button {
         this.data = data;
         this.id = data.toJSON()['custom_id'];
         this.execute = execute;
-    }
-
-    toJSON(): APIButtonComponent {
-        return this.data.toJSON();
     }
 }
