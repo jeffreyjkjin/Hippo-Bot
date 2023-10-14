@@ -1,4 +1,5 @@
 import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js'
+import { MongoClient } from 'mongodb'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -10,6 +11,8 @@ export default class ExtendedClient extends Client {
     commands: Collection<string, Command>;
     buttons: Collection<string, Button>;
     modals: Collection<string, Modal>;
+ 
+    mongo: MongoClient;
 
     constructor() {
         super({
@@ -29,6 +32,9 @@ export default class ExtendedClient extends Client {
         
         this.modals = new Collection<string, Modal>();
         this.loadModals();
+
+        this.mongo = new MongoClient(process.env.MONGO);
+        this.connectMongo();
     }
 
     private loadCommands() {
@@ -52,8 +58,8 @@ export default class ExtendedClient extends Client {
         (async () => {
             try {
                 await rest.put(
-                    // Routes.applicationCommands(process.env.CLIENT_ID), 
-                    Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), 
+                    Routes.applicationCommands(process.env.CLIENT), 
+                    // Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD), 
                     { 
                         body: this.commands.map((command) => { 
                             console.log(`Registering command: ${command.name}`);
@@ -61,7 +67,7 @@ export default class ExtendedClient extends Client {
                         })
                     }
                 );
-            } catch (e) {
+            } catch (e: any) {
                 console.log(e);
             }
         })();
@@ -97,5 +103,17 @@ export default class ExtendedClient extends Client {
             console.log(`Loading modal: ${modal.id}`);
             this.modals.set(modal.id, modal);
         });        
+    }
+
+    private async connectMongo() {
+        try {
+            await this.mongo.connect();
+            await this.mongo.db('hippobot').command({ ping: 1 });
+            console.log('Connected to MongoDB!');
+        }
+        catch (e: any) {
+            console.log(e);
+        }
+
     }
 }
