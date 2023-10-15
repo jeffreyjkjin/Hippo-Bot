@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from '@discordjs/builders'
 
 import EventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
-import EventModal from '../utils/createeventmodal'
+import CreateEventModal from '../utils/createeventmodal'
 import Command from '../structures/Command'
 
 module.exports = new Command(
@@ -50,7 +50,7 @@ module.exports = new Command(
         }
 
         if (!event.title || !event.time) {
-            await i.showModal(EventModal(event));
+            await i.showModal(CreateEventModal(event));
         }
         else {
             await i.reply({ embeds: [EventEmbed(i, event)] });

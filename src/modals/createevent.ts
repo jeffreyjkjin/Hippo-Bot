@@ -1,12 +1,12 @@
 import { ModalSubmitInteraction } from 'discord.js'
 
 import EventEmbed from '../embeds/eventembed'
-import EventModal from '../utils/createeventmodal'
+import CreateEventModal from '../utils/createeventmodal'
 import EventData from '../interfaces/EventData'
 import Modal from '../structures/Modal'
 
 module.exports = new Modal(
-    EventModal(),
+    CreateEventModal(),
     async (i: ModalSubmitInteraction) => {
         const event: EventData = {
             title: i.fields.getTextInputValue('title'),
