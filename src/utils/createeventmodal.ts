@@ -15,21 +15,13 @@ const CreateEventModal = (event?: EventData): ModalBuilder => {
         .setValue((event && event.title) || '')
         .setRequired(true);
         
-    const time: TextInputBuilder = new TextInputBuilder()
-        .setCustomId('time')
-        .setLabel('What time is your event at?')
+    const datetime: TextInputBuilder = new TextInputBuilder()
+        .setCustomId('datetime')
+        .setLabel('When is your event?')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('10:00pm PST')
-        .setValue((event && event.time) || '')
+        .setPlaceholder('October 2, 2023 10:00pm PST')
+        .setValue((event && event.datetime) || '')
         .setRequired(true);
-        
-    const date: TextInputBuilder = new TextInputBuilder()
-        .setCustomId('date')
-        .setLabel('What day is your event on?')
-        .setStyle(TextInputStyle.Short)
-        .setPlaceholder('October 2, 2023')
-        .setValue((event && event.date) || '')
-        .setRequired(false);
     
     const description: TextInputBuilder = new TextInputBuilder()
         .setCustomId('description')
@@ -49,16 +41,14 @@ const CreateEventModal = (event?: EventData): ModalBuilder => {
     
     const titleRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
         .addComponents(title);
-    const timeRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
-        .addComponents(time);
-    const dateRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
-        .addComponents(date);
+    const datetimeRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
+        .addComponents(datetime);
     const descRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
         .addComponents(description);
     const imageRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>()
         .addComponents(image);
     
-    modal.addComponents(titleRow, timeRow, dateRow, descRow, imageRow);    
+    modal.addComponents(titleRow, datetimeRow, descRow, imageRow);    
 
     return modal;
 }

@@ -17,13 +17,8 @@ module.exports = new Command(
         })
         .addStringOption((option) => {
             return option
-                .setName('time')
-                .setDescription('What time is your event at?')
-        })
-        .addStringOption((option) => {
-            return option
-                .setName('date')
-                .setDescription('What day is your event on?')
+                .setName('datetime')
+                .setDescription('When is your event?')
         })
         .addStringOption((option) => {
             return option
@@ -39,9 +34,7 @@ module.exports = new Command(
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
-            time: i.options.getString('time'),
-            date: i.options.getString('date'),
-            datetime: null,
+            datetime: i.options.getString('datetime'),
             attendees: [] as string[],
             maybe: [] as string[],
             pass: [] as string[],
@@ -49,7 +42,7 @@ module.exports = new Command(
             creator: i.user.id
         }
 
-        if (!event.title || !event.time) {
+        if (!event.title || !event.datetime) {
             await i.showModal(CreateEventModal(event));
         }
         else {

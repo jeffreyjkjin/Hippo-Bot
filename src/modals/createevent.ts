@@ -11,9 +11,7 @@ module.exports = new Modal(
         const event: EventData = {
             title: i.fields.getTextInputValue('title'),
             description: i.fields.getTextInputValue('description'),
-            time: i.fields.getTextInputValue('time'),
-            date: i.fields.getTextInputValue('date'),
-            datetime: null,
+            datetime: i.fields.getTextInputValue('datetime'),
             attendees: [] as string[],
             maybe: [] as string[],
             pass: [] as string[],
