@@ -3,8 +3,9 @@ import { SlashCommandBuilder } from '@discordjs/builders'
 
 import EventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
-import CreateEventModal from '../utils/createeventmodal'
 import Command from '../structures/Command'
+import createEventModal from '../utils/createeventmodal'
+import parseDate from '../utils/parsedate'
 
 module.exports = new Command(
     new SlashCommandBuilder()
@@ -31,10 +32,22 @@ module.exports = new Command(
                 .setDescription('Add an image to your event.')
         }),
     async (i: ChatInputCommandInteraction) => {
+        let datetime: string;
+        try {
+            datetime = parseDate(i.options.getString('datetime'));
+        }
+        catch (e) {
+            await i.reply({ 
+                content: e.toString().slice(7,), 
+                ephemeral: true
+            });
+            return;
+        }
+
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
-            datetime: i.options.getString('datetime'),
+            datetime: datetime,
             attendees: [] as string[],
             maybe: [] as string[],
             pass: [] as string[],
@@ -43,7 +56,7 @@ module.exports = new Command(
         }
 
         if (!event.title || !event.datetime) {
-            await i.showModal(CreateEventModal(event));
+            await i.showModal(createEventModal(event));
         }
         else {
             await i.reply({ embeds: [EventEmbed(i, event)] });

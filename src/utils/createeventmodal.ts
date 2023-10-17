@@ -2,7 +2,7 @@ import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from
 
 import EventData from '../interfaces/EventData'
 
-const CreateEventModal = (event?: EventData): ModalBuilder => {
+const createEventModal = (event?: EventData): ModalBuilder => {
     const modal: ModalBuilder = new ModalBuilder()
         .setCustomId('createevent')
         .setTitle('Create an event!');
@@ -53,4 +53,4 @@ const CreateEventModal = (event?: EventData): ModalBuilder => {
     return modal;
 }
 
-export default CreateEventModal;
+export default createEventModal;
