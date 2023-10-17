@@ -9,7 +9,7 @@ const EventEmbed = (i: BaseInteraction, event: EventData): EmbedBuilder => {
         .addFields(
             { 
                 name: 'Time', 
-                value: 'pizza time' 
+                value: `<t:${Date.parse(event.datetime)/1000}>`
             },
             {
                 name: `:white_check_mark: Attendees (${event.attendees.length})`,
