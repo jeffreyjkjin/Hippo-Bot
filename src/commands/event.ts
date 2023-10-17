@@ -5,6 +5,7 @@ import EventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Command from '../structures/Command'
 import createEventModal from '../utils/createeventmodal'
+import insertEvent from '../utils/insertevent'
 import parseDate from '../utils/parsedate'
 
 module.exports = new Command(
@@ -57,9 +58,20 @@ module.exports = new Command(
 
         if (!event.title || !event.datetime) {
             await i.showModal(createEventModal(event));
+            return;
         }
-        else {
-            await i.reply({ embeds: [EventEmbed(i, event)] });
+
+        try {
+            await insertEvent(i, event);
         }
+        catch (e) {
+            await i.reply({ 
+                content: e.toString().slice(7,), 
+                ephemeral: true
+            });
+            return;
+        }
+
+        await i.reply({ embeds: [EventEmbed(i, event)] });
     }
 );

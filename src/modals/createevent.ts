@@ -4,6 +4,7 @@ import EventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Modal from '../structures/Modal'
 import createEventModal from '../utils/createeventmodal'
+import insertEvent from '../utils/insertevent'
 import parseDate from '../utils/parsedate'
 
 module.exports = new Modal(
@@ -30,6 +31,17 @@ module.exports = new Modal(
             pass: [] as string[],
             image: i.fields.getTextInputValue('image'),
             creator: i.user.id
+        }
+
+        try {
+            await insertEvent(i, event);
+        }
+        catch (e) {
+            await i.reply({ 
+                content: e.toString().slice(7,), 
+                ephemeral: true
+            });
+            return;
         }
 
         await i.reply({ embeds: [EventEmbed(i, event)] });
