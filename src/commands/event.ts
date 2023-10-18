@@ -33,45 +33,34 @@ module.exports = new Command(
                 .setDescription('Add an image to your event.')
         }),
     async (i: ChatInputCommandInteraction) => {
-        let datetime: string;
-        try {
-            datetime = parseDate(i.options.getString('datetime'));
-        }
-        catch (e) {
-            await i.reply({ 
-                content: e.toString().slice(7,), 
-                ephemeral: true
-            });
-            return;
-        }
-
+        
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
-            datetime: datetime,
+            datetime: i.options.getString('datetime'),
             attendees: [] as string[],
             maybe: [] as string[],
             pass: [] as string[],
             image: i.options.getString('image'),
             creator: i.user.id
         }
-
+        
         if (!event.title || !event.datetime) {
             await i.showModal(createEventModal(event));
             return;
         }
-
+        
         try {
+            event.datetime = parseDate(event.datetime);
+            
             await insertEvent(i, event);
+            await i.reply({ embeds: [EventEmbed(i, event)] });
         }
         catch (e) {
             await i.reply({ 
                 content: e.toString().slice(7,), 
                 ephemeral: true
             });
-            return;
         }
-
-        await i.reply({ embeds: [EventEmbed(i, event)] });
     }
 );

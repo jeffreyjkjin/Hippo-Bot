@@ -10,22 +10,10 @@ import parseDate from '../utils/parsedate'
 module.exports = new Modal(
     createEventModal(),
     async (i: ModalSubmitInteraction) => {
-        let datetime: string;
-        try {
-            datetime = parseDate(i.fields.getTextInputValue('datetime'));
-        }
-        catch (e) {
-            await i.reply({ 
-                content: e.toString().slice(7,), 
-                ephemeral: true
-            });
-            return;
-        }
-
         const event: EventData = {
             title: i.fields.getTextInputValue('title'),
             description: i.fields.getTextInputValue('description'),
-            datetime: datetime,
+            datetime: i.fields.getTextInputValue('datetime'),
             attendees: [] as string[],
             maybe: [] as string[],
             pass: [] as string[],
@@ -34,16 +22,17 @@ module.exports = new Modal(
         }
 
         try {
+            event.datetime = parseDate(event.datetime);
+
             await insertEvent(i, event);
+            await i.reply({ embeds: [EventEmbed(i, event)] });
         }
         catch (e) {
             await i.reply({ 
                 content: e.toString().slice(7,), 
                 ephemeral: true
             });
-            return;
         }
 
-        await i.reply({ embeds: [EventEmbed(i, event)] });
     }
 );

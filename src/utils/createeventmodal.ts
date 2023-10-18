@@ -19,7 +19,7 @@ const createEventModal = (event?: EventData): ModalBuilder => {
         .setCustomId('datetime')
         .setLabel('When is your event?')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('October 2, 2023 10:00pm PST')
+        .setPlaceholder('October 2, 2023 10:00 PM PST')
         .setValue((event && event.datetime) || '')
         .setRequired(true);
     
