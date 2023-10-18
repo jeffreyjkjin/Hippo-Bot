@@ -5,6 +5,7 @@ import path from 'node:path'
 
 import Button from './Button'
 import Command from './Command'
+import Event from './Event'
 import Modal from './Modal'
 
 export default class ExtendedClient extends Client {
@@ -35,6 +36,8 @@ export default class ExtendedClient extends Client {
 
         this.mongo = new MongoClient(process.env.MONGO);
         this.connectMongo();
+
+        this.loadEvents();
     }
 
     private loadCommands() {
@@ -89,7 +92,6 @@ export default class ExtendedClient extends Client {
         });        
     }
 
-
     private async loadModals() {
         const modalPath: string = path.join(__dirname, '../modals');
         const modalFiles: string[] = fs.readdirSync(modalPath).filter((file: string): boolean => { 
@@ -115,5 +117,26 @@ export default class ExtendedClient extends Client {
             console.log(e);
         }
 
+    }
+
+    private async loadEvents() {
+        const eventPath: string = path.join(__dirname, '../events');
+        const eventFiles: string[] = fs.readdirSync(eventPath).filter((file: string): boolean => { 
+            return file.endsWith('.ts' || '.js'); 
+        });
+
+        eventFiles.forEach((file: string) => {
+            const filePath: string = path.join(eventPath, file);
+            const event: Event = require(filePath);
+
+            console.log(`Loading event: ${file.slice(0,-3)}`);
+
+            if (event.once) {
+                this.once(event.name, (...args) => { event.execute(...args) });
+            }
+            else {
+                this.on(event.name, (...args) => { event.execute(...args) });
+            }
+        });                
     }
 }
