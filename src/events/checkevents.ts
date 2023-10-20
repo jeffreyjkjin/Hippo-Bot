@@ -31,12 +31,7 @@ module.exports = new Event(
                     }
 
                     if (channel.isTextBased()) {
-                        await channel.send({ 
-                            content: event.attendees.map((id: string) => {
-                                return userMention(id);
-                            }).toString(),
-                            embeds: [startEventEmbed(event)] 
-                        });
+                        await channel.send(startEventEmbed(event));
                     }
 
                     try {
