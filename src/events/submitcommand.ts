@@ -1,12 +1,16 @@
+import { BaseInteraction } from 'discord.js'
+
 import Command from '../structures/Command'
 import Event from '../structures/Event'
+import ExtendedClient from '../structures/ExtendedClient'
 
 module.exports = new Event(
    'interactionCreate',
    false,
-   async (i: any) => {
+   async (i: BaseInteraction) => {
         if (i.isChatInputCommand()) {
-            const command: Command = i.client.commands.get(i.commandName);
+            const client: ExtendedClient = i.client as ExtendedClient;
+            const command: Command = client.commands.get(i.commandName);
 
             if (!command) {
                 await i.followUp({ 

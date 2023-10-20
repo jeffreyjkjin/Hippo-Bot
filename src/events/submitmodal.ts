@@ -1,12 +1,16 @@
+import { BaseInteraction } from 'discord.js'
+
 import Event from '../structures/Event'
+import ExtendedClient from '../structures/ExtendedClient'
 import Modal from '../structures/Modal'
 
 module.exports = new Event(
    'interactionCreate',
    false,
-   async (i: any) => {
+   async (i: BaseInteraction) => {
         if (i.isModalSubmit()) {
-            const modal: Modal = i.client.modals.get(i.customId);
+            const client: ExtendedClient = i.client as ExtendedClient;
+            const modal: Modal = client.modals.get(i.customId);
 
             if (!modal) {
                 await i.followUp({ 

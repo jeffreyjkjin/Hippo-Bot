@@ -1,12 +1,16 @@
+import { BaseInteraction } from 'discord.js'
+
 import Button from '../structures/Button'
 import Event from '../structures/Event'
+import ExtendedClient from '../structures/ExtendedClient'
 
 module.exports = new Event(
    'interactionCreate',
    false,
-   async (i: any) => {
+   async (i: BaseInteraction) => {
         if (i.isButton()) {
-            const button: Button = i.client.buttons.get(i.customId);
+            const client: ExtendedClient = i.client as ExtendedClient;
+            const button: Button = client.buttons.get(i.customId);
         
             if (!button) {
                 await i.followUp({ 
