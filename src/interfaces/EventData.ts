@@ -6,5 +6,8 @@ export default interface EventData {
     maybe: string[];
     pass: string[];
     image: string;
-    creator: string;
+    messageUrl: string;
+    channelId: string;
+    creatorId: string;
+    started: boolean;
 }
