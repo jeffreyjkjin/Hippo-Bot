@@ -1,6 +1,6 @@
-import { ModalSubmitInteraction } from 'discord.js'
+import { InteractionResponse, ModalSubmitInteraction } from 'discord.js'
 
-import EventEmbed from '../embeds/eventembed'
+import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Modal from '../structures/Modal'
 import createEventModal from '../utils/createeventmodal'
@@ -18,14 +18,19 @@ module.exports = new Modal(
             maybe: [] as string[],
             pass: [] as string[],
             image: i.fields.getTextInputValue('image'),
-            creator: i.user.id
+            messageUrl: null,
+            channelId: i.channelId,
+            creatorId: i.user.id,
+            started: false
         }
 
         try {
             event.datetime = parseDate(event.datetime);
 
+            const message: InteractionResponse = await i.reply({ embeds: [eventEmbed(i, event)] });
+            event.messageUrl = (await message.fetch()).url;
+            
             await insertEvent(i, event);
-            await i.reply({ embeds: [EventEmbed(i, event)] });
         }
         catch (e) {
             await i.reply({ 

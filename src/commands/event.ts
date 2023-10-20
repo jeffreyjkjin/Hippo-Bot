@@ -1,7 +1,7 @@
-import { ChatInputCommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, InteractionResponse } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
-import EventEmbed from '../embeds/eventembed'
+import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Command from '../structures/Command'
 import createEventModal from '../utils/createeventmodal'
@@ -33,7 +33,6 @@ module.exports = new Command(
                 .setDescription('Add an image to your event.')
         }),
     async (i: ChatInputCommandInteraction) => {
-        
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
@@ -42,7 +41,10 @@ module.exports = new Command(
             maybe: [] as string[],
             pass: [] as string[],
             image: i.options.getString('image'),
-            creator: i.user.id
+            channelId: i.channelId,
+            messageUrl: null,
+            creatorId: i.user.id,
+            started: false
         }
         
         if (!event.title || !event.datetime) {
@@ -53,8 +55,10 @@ module.exports = new Command(
         try {
             event.datetime = parseDate(event.datetime);
             
+            const message: InteractionResponse = await i.reply({ embeds: [eventEmbed(i, event)] });
+            event.messageUrl = (await message.fetch()).url;
+
             await insertEvent(i, event);
-            await i.reply({ embeds: [EventEmbed(i, event)] });
         }
         catch (e) {
             await i.reply({ 
