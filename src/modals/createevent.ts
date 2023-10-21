@@ -1,4 +1,4 @@
-import { InteractionResponse, ModalSubmitInteraction } from 'discord.js'
+import { InteractionReplyOptions, InteractionResponse, ModalSubmitInteraction } from 'discord.js'
 
 import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
@@ -27,14 +27,14 @@ module.exports = new Modal(
         try {
             event.datetime = parseDate(event.datetime);
 
-            const message: InteractionResponse = await i.reply({ embeds: [eventEmbed(i, event)] });
+            const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
             
             await insertEvent(i, event);
         }
-        catch (e) {
+        catch (e: any) {
             await i.reply({ 
-                content: e.toString().slice(7,), 
+                content: e.toString(), 
                 ephemeral: true
             });
         }

@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, InteractionResponse } from 'discord.js'
+import { ChatInputCommandInteraction, InteractionReplyOptions, InteractionResponse } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
 import eventEmbed from '../embeds/eventembed'
@@ -15,22 +15,22 @@ module.exports = new Command(
         .addStringOption((option) => {
             return option
                 .setName('title')
-                .setDescription('What is your event called?')
+                .setDescription('What is your event called? (i.e., My awesome event)');
         })
         .addStringOption((option) => {
             return option
                 .setName('datetime')
-                .setDescription('When is your event?')
+                .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)');
         })
         .addStringOption((option) => {
             return option
                 .setName('description')
-                .setDescription('What is your event about?')
+                .setDescription('What is your event about? (i.e., An epic event for epic gamers.)');
         })
         .addStringOption((option) => {
             return option
                 .setName('image')
-                .setDescription('Add an image to your event.')
+                .setDescription('Add an image to your event. (i.e., https://i.imgur.com/w8as1S9.png)');
         }),
     async (i: ChatInputCommandInteraction) => {
         const event: EventData = {
@@ -55,14 +55,14 @@ module.exports = new Command(
         try {
             event.datetime = parseDate(event.datetime);
             
-            const message: InteractionResponse = await i.reply({ embeds: [eventEmbed(i, event)] });
+            const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
 
             await insertEvent(i, event);
         }
-        catch (e) {
+        catch (e: any) {
             await i.reply({ 
-                content: e.toString().slice(7,), 
+                content: e.toString(), 
                 ephemeral: true
             });
         }
