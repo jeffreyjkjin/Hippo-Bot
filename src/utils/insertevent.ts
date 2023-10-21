@@ -1,11 +1,16 @@
-import EventData from "../interfaces/EventData"
+import { BaseInteraction } from "discord.js"
 
-const insertEvent = async (i: any, event: EventData) => {
+import EventData from "../interfaces/EventData"
+import ExtendedClient from "../structures/ExtendedClient"
+
+const insertEvent = async (i: BaseInteraction, event: EventData) => {
     try {
-        await i.client.mongo.db(i.guildId).collection('Events').insertOne(event);
+        const client: ExtendedClient = i.client as ExtendedClient;
+
+        await client.mongo.db(i.guildId).collection('Events').insertOne(event);
     }
     catch (e: any) {
-        throw Error('This event could not be created.');
+        throw 'This event could not be created.';
     }
 }
 

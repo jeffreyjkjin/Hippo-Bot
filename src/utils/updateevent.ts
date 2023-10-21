@@ -5,10 +5,11 @@ const updateEvent = async (client: ExtendedClient, guildId: string, event: Event
     try {
         await client.mongo.db(guildId).collection('Events').replaceOne(
             { messageUrl: event.messageUrl },
-            event);
+            event
+        );
     }
     catch (e: any) {
-        throw Error('This event could not be updated');
+        throw 'This event could not be updated';
     }
 }
 

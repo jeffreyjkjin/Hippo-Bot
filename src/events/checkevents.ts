@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Channel, userMention } from 'discord.js'
+import { Channel } from 'discord.js'
 
 import startEventEmbed from '../embeds/starteventembed'
 import EventData from '../interfaces/EventData'
