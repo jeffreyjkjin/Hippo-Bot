@@ -20,22 +20,29 @@ module.exports = new Button(
                 messageUrl: i.message.url 
             });
 
-            if (event.pass.includes(i.user.id) || event.started) {
+            if (event.started) {
                 i.update({});
                 return;
             }
 
-            event.attendees = event.attendees.filter((id: string): boolean => {
-                return id !== i.user.id;
-            });
+            if (!event.pass.includes(i.user.id)) {
+                event.attendees = event.attendees.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });
+    
+                event.maybe = event.maybe.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });
 
-            event.maybe = event.maybe.filter((id: string): boolean => {
-                return id !== i.user.id;
-            });
+                event.pass.push(i.user.id);
+            }
+            else {
+                event.pass = event.pass.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });                
+            }
             
-            event.pass.push(i.user.id);
             await updateEvent(client, i.guildId, event);
-
             await i.update(eventEmbed(i, event) as InteractionUpdateOptions);
         }
         catch (e: any) {
