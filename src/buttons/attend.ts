@@ -1,6 +1,7 @@
 import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions } from 'discord.js'
 import { ButtonBuilder } from '@discordjs/builders'
 
+import attendEmbed from '../embeds/attendembed'
 import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Button from '../structures/Button'
@@ -20,23 +21,31 @@ module.exports = new Button(
                 messageUrl: i.message.url 
             });
 
-            if (event.attendees.includes(i.user.id) || event.started) {
+            if (event.started) {
                 i.update({});
                 return;
             }
 
-            event.maybe = event.maybe.filter((id: string): boolean => {
-                return id !== i.user.id;
-            });
+            if (!event.attendees.includes(i.user.id)) {
+                event.maybe = event.maybe.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });
+    
+                event.pass = event.pass.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });
+                
+                event.attendees.push(i.user.id);
+            }
+            else {
+                event.attendees.filter((id: string): boolean => {
+                    return id !== i.user.id;
+                });
+            }
 
-            event.pass = event.pass.filter((id: string): boolean => {
-                return id !== i.user.id;
-            });
-            
-            event.attendees.push(i.user.id);
             await updateEvent(client, i.guildId, event);
-
             await i.update(eventEmbed(i, event) as InteractionUpdateOptions);
+            await i.user.send(attendEmbed(event));
         }
         catch (e: any) {
             throw Error();
