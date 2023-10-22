@@ -1,4 +1,4 @@
-import { ActionRowBuilder, BaseInteraction, EmbedBuilder, Message, MessageCreateOptions, userMention } from 'discord.js'
+import { ActionRowBuilder, BaseInteraction, EmbedBuilder, MessageCreateOptions, userMention } from 'discord.js'
 import { ButtonBuilder } from '@discordjs/builders'
 
 import EventData from '../interfaces/EventData'
@@ -13,7 +13,7 @@ const printNames = (ids: string[]): string => {
 
 const eventEmbed = (i: BaseInteraction, event: EventData): MessageCreateOptions => {
     const embed: EmbedBuilder = new EmbedBuilder()
-        .setTitle(`:calendar_spiral: ${event.title}`)
+        .setTitle(`:calendar_spiral: **${event.title}**`)
         .setDescription(event.description ? event.description : null)
         .addFields(
             { 
