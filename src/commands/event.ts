@@ -33,6 +33,22 @@ module.exports = new Command(
                 .setDescription('Add an image to your event. (i.e., https://i.imgur.com/w8as1S9.png)');
         }),
     async (i: ChatInputCommandInteraction) => {
+        if (!i.channel) {
+            await i.reply({
+                content: 'This command can only be used in a server.',
+                ephemeral: true
+            });
+            return;
+        }
+
+        if (i.channel.isThread() || i.channel.isVoiceBased()) {
+            await i.reply({
+                content: 'This command can only be used in a regular text channel.',
+                ephemeral: true
+            });
+            return;
+        }
+
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
