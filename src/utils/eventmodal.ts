@@ -2,10 +2,18 @@ import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from
 
 import EventData from '../interfaces/EventData'
 
-const createEventModal = (event?: EventData): ModalBuilder => {
+/*
+     DESC: Generates a submission form to create/edit an event.
+      PRE: event must be passed when using id = 'editevent'.
+    PARAM: id - A valid id of a modal.
+           event - An event associated with the modal.
+     POST: Calls appropriate modal submission event. 
+
+*/
+const eventModal = (id: string, event?: EventData): ModalBuilder => {
     const modal: ModalBuilder = new ModalBuilder()
-        .setCustomId('createevent')
-        .setTitle('Create an event!');
+        .setCustomId(id)
+        .setTitle((id === 'createevent' && 'Create an event!') || (id === 'editevent' && 'Edit an event!'));
 
     const title: TextInputBuilder = new TextInputBuilder()
         .setCustomId('title')
@@ -53,4 +61,4 @@ const createEventModal = (event?: EventData): ModalBuilder => {
     return modal;
 }
 
-export default createEventModal;
+export default eventModal;
