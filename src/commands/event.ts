@@ -4,8 +4,8 @@ import { SlashCommandBuilder } from '@discordjs/builders'
 import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
 import Command from '../structures/Command'
-import createEventModal from '../utils/createeventmodal'
-import insertEvent from '../utils/insertevent'
+import ExtendedClient from '../structures/ExtendedClient'
+import eventModal from '../utils/eventmodal'
 import parseDate from '../utils/parsedate'
 
 module.exports = new Command(
@@ -32,7 +32,14 @@ module.exports = new Command(
                 .setName('image')
                 .setDescription('Add an image to your event. (i.e., https://i.imgur.com/w8as1S9.png)');
         }),
+    /*
+         DESC: Allows user to create an event using command arguments. 
+          PRE: Arguments passed to this command are valid.
+        PARAM: i - Interaction from command call.
+         POST: A new event is added to db and an embed display this event is posted.
+    */
     async (i: ChatInputCommandInteraction) => {
+        // only allow use of this command in regular text channels in guild
         if (!i.channel) {
             await i.reply({
                 content: 'This command can only be used in a server.',
@@ -49,6 +56,7 @@ module.exports = new Command(
             return;
         }
 
+        // create event with command arguments
         const event: EventData = {
             title: i.options.getString('title'),
             description: i.options.getString('description'),
@@ -63,18 +71,21 @@ module.exports = new Command(
             started: false
         }
         
+        // display modal if not all required fields were given
         if (!event.title || !event.datetime) {
-            await i.showModal(createEventModal(event));
+            await i.showModal(eventModal('createevent', event));
             return;
         }
         
+        // insert event into db and create event embed post
+        const client: ExtendedClient = i.client as ExtendedClient;
         try {
             event.datetime = parseDate(event.datetime);
             
             const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
 
-            await insertEvent(i, event);
+            await client.mongo.db('Events').collection<EventData>(i.guild.id).insertOne(event);
         }
         catch (e: any) {
             await i.reply({ 
