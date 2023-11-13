@@ -22,14 +22,11 @@ module.exports = new Event(
             client.guilds.cache.each(async (guild: Guild) => {
                 // finds events that have started at the current time
                 const events: EventData[] = await client.mongo.db('Events').collection<EventData>(guild.id).find({
-                    datetime: dayjs().second(0).millisecond(0).toISOString()
+                    datetime: dayjs().second(0).millisecond(0).toISOString(),
+                    started: false
                 }).toArray();
 
                 events.forEach(async (event: EventData) => {
-                    if (event.started) {
-                        return;
-                    }
-
                     // send event start post
                     let channel: TextChannel;
                     try {
@@ -41,8 +38,12 @@ module.exports = new Event(
                     await channel.send(startEventEmbed(event));
 
                     try {
-                        event.started = true;
-                        await updateEvent(client, guild.id, event);
+                        await client.mongo.db('Events').collection<EventData>(guild.id).updateOne(
+                            { messageUrl: event.messageUrl },
+                            {
+                                $set: { started: true }
+                            }
+                        );
                     }
                     catch (e: any) {
                         console.log(e);
