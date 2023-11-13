@@ -2,14 +2,22 @@ import { InteractionReplyOptions, InteractionResponse, ModalSubmitInteraction } 
 
 import eventEmbed from '../embeds/eventembed'
 import EventData from '../interfaces/EventData'
+import ExtendedClient from '../structures/ExtendedClient'
 import Modal from '../structures/Modal'
-import createEventModal from '../utils/createeventmodal'
-import insertEvent from '../utils/insertevent'
+import eventModal from '../utils/eventmodal'
 import parseDate from '../utils/parsedate'
 
 module.exports = new Modal(
-    createEventModal(),
+    eventModal('createevent'),
+    /*
+         DESC: Creates an event using the details provided from the modal.
+          PRE: The data from the modal is valid.
+        PARAM: i - Interaction from modal submission.
+         POST: Inserts event into db and creates an event embed for it.
+    */
     async (i: ModalSubmitInteraction) => {
+        const client: ExtendedClient = i.client as ExtendedClient;
+        
         const event: EventData = {
             title: i.fields.getTextInputValue('title'),
             description: i.fields.getTextInputValue('description'),
@@ -30,7 +38,7 @@ module.exports = new Modal(
             const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
             
-            await insertEvent(i, event);
+            await client.mongo.db('Events').collection(i.guild.id).insertOne(event);
         }
         catch (e: any) {
             await i.reply({ 
