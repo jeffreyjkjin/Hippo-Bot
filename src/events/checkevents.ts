@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Channel } from 'discord.js'
+import { Guild, TextChannel } from 'discord.js'
 
 import startEventEmbed from '../embeds/starteventembed'
 import EventData from '../interfaces/EventData'
@@ -10,10 +10,18 @@ import updateEvent from '../utils/updateevent'
 module.exports = new Event(
     'ready',
     false,
+    /*
+         DESC: Checks for events that have started every 60 seconds.
+          PRE: The events in the database are valid.
+        PARAM: client - Client from bot.
+         POST: If an event has started, post a starting announcement and update event to be started.
+    */
     async (client: ExtendedClient) => {
         setInterval(async () => {
-            client.guilds.cache.each(async (guild) => {
-                const events: EventData[] = await client.mongo.db(guild.id).collection<EventData>('Events').find({
+            // loops through every guild that the bot is in
+            client.guilds.cache.each(async (guild: Guild) => {
+                // finds events that have started at the current time
+                const events: EventData[] = await client.mongo.db('Events').collection<EventData>(guild.id).find({
                     datetime: dayjs().second(0).millisecond(0).toISOString()
                 }).toArray();
 
@@ -22,17 +30,15 @@ module.exports = new Event(
                         return;
                     }
 
-                    let channel: Channel;
+                    // send event start post
+                    let channel: TextChannel;
                     try {
-                        channel = await guild.channels.fetch(event.channelId);
+                        channel = await guild.channels.fetch(event.channelId) as TextChannel;
                     }
                     catch (e: any) {
                         channel = guild.systemChannel;
                     }
-
-                    if (channel.isTextBased()) {
-                        await channel.send(startEventEmbed(event));
-                    }
+                    await channel.send(startEventEmbed(event));
 
                     try {
                         event.started = true;
@@ -44,6 +50,6 @@ module.exports = new Event(
                 });
 
             });
-        }, 60000);
+        }, 10000);
     }
 );
