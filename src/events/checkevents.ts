@@ -5,7 +5,6 @@ import startEventEmbed from '../embeds/starteventembed'
 import EventData from '../interfaces/EventData'
 import Event from '../structures/Event'
 import ExtendedClient from '../structures/ExtendedClient'
-import updateEvent from '../utils/updateevent'
 
 module.exports = new Event(
     'ready',
