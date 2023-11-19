@@ -1,6 +1,7 @@
 import { InteractionReplyOptions, InteractionResponse, ModalSubmitInteraction } from 'discord.js'
 
 import eventEmbed from '../embeds/eventembed'
+import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import ExtendedClient from '../structures/ExtendedClient'
 import Modal from '../structures/Modal'
@@ -32,19 +33,26 @@ module.exports = new Modal(
             started: false
         }
 
+        // check if time is valid
         try {
             event.datetime = parseDate(event.datetime);
+        }
+        catch (e: any) {
+            await i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
+            return;
+        }
 
+        // insert event into db and create event embed post
+        try {
             const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
             
             await client.mongo.db('Events').collection(i.guild.id).insertOne(event);
         }
         catch (e: any) {
-            await i.reply({ 
-                content: e.toString(), 
-                ephemeral: true
-            });
+            await i.reply(messageEmbed(
+                'This event could not be created.'
+            ) as InteractionReplyOptions);
         }
 
     }

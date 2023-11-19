@@ -1,7 +1,7 @@
 import { InteractionReplyOptions, Message, MessageEditOptions, ModalSubmitInteraction } from 'discord.js'
 
 import eventEmbed from '../embeds/eventembed'
-import editEventEmbed from '../embeds/editeventembed'
+import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import ExtendedClient from '../structures/ExtendedClient'
 import Modal from '../structures/Modal'
@@ -23,10 +23,19 @@ module.exports = new Modal(
         const description: string = i.fields.getTextInputValue('description');
         const datetime: string = i.fields.getTextInputValue('datetime');
         const image: string = i.fields.getTextInputValue('image');
-
+        
+        let parsedDatetime: string;
+        // check if time is valid
         try {
-            const parsedDatetime: string = parseDate(datetime);
+            parsedDatetime = parseDate(datetime);
+        }
+        catch (e: any) {
+            i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
+            return;
+        }
 
+        // update event and edit previous event embed post
+        try {
             // update event
             const event: EventData = await client.mongo.db('EditEvent').collection<EventData>(i.user.id).findOne({});
             await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
@@ -52,13 +61,14 @@ module.exports = new Modal(
             const eventPost: Message = await i.channel.messages.fetch(event.messageUrl.split('/').at(-1));
             await eventPost.edit(eventEmbed(i, updatedEvent) as MessageEditOptions);
             
-            await i.reply(editEventEmbed(updatedEvent) as InteractionReplyOptions);
+            await i.reply(messageEmbed(
+                `[**${updatedEvent.title}**](${updatedEvent.messageUrl}) has been updated.`
+            ) as InteractionReplyOptions);
         }
         catch (e: any) {
-            await i.reply({ 
-                content: e.toString(), 
-                ephemeral: true
-            });
+            await i.reply(messageEmbed(
+                `This event could not be updated.`
+            ) as InteractionReplyOptions);
         }
     }
 );
