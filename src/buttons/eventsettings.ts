@@ -2,6 +2,7 @@ import { ButtonInteraction, ButtonStyle, InteractionReplyOptions } from "discord
 import { ButtonBuilder } from "@discordjs/builders"
 
 import eventSettingsEmbed from "../embeds/eventsettingsembed"
+import messageEmbed from "../embeds/messageembed"
 import EventData from "../interfaces/EventData"
 import Button from "../structures/Button"
 import ExtendedClient from "../structures/ExtendedClient"
@@ -20,18 +21,12 @@ module.exports = new Button(
             });
 
             if (event.started) {
-                await i.reply({
-                    content: 'You cannot edit an event that has started.',
-                    ephemeral: true
-                });
+                await i.reply(messageEmbed('You cannot edit an event that has started.') as InteractionReplyOptions);
                 return;
             }
 
             if (i.user.id != event.creatorId) {
-                await i.reply({
-                    content: "You do not have permission to edit this event.",
-                    ephemeral: true
-                });
+                await i.reply(messageEmbed('You do not have permission to edit this event.') as InteractionReplyOptions)
                 return;
             }
 

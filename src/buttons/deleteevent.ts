@@ -1,7 +1,7 @@
 import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message } from "discord.js"
 import { ButtonBuilder } from "@discordjs/builders"
 
-import deleteEventEmbed from "../embeds/deleteeventembed"
+import messageEmbed from "../embeds/messageembed"
 import EventData from "../interfaces/EventData"
 import Button from "../structures/Button"
 import ExtendedClient from "../structures/ExtendedClient"
@@ -17,12 +17,13 @@ module.exports = new Button(
         PARAM: i - Interaction from button press.
          POST: The event post is removed and it's event is deleted from the database.
     */
-    async (i: ButtonInteraction) => {
+   async (i: ButtonInteraction) => {
+        const client: ExtendedClient = i.client as ExtendedClient;
+        const messageUrl: string = i.message.embeds[0].description.split('(').at(-1).slice(0, -2);
+        
         try {
             // get event data
-            const client: ExtendedClient = i.client as ExtendedClient;
-            const messageUrl: string = i.message.embeds[0].description.split('(').at(-1).slice(0, -2);
-            const event: EventData = await client.mongo.db(i.guildId).collection<EventData>('Events').findOne({
+            const event: EventData = await client.mongo.db('Events').collection<EventData>(i.guildId).findOne({
                 messageUrl: messageUrl
             });
 
@@ -32,7 +33,7 @@ module.exports = new Button(
  
             await client.mongo.db(i.guildId).collection<EventData>('Events').deleteOne(event);
             
-            await i.update(deleteEventEmbed(event) as InteractionUpdateOptions);
+            await i.update(messageEmbed(`**${event.title}** has been deleted.`) as InteractionUpdateOptions);
         }
         catch (e: any) {
             throw Error();
