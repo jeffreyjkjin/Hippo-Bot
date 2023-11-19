@@ -1,8 +1,14 @@
-import { ActionRowBuilder, BaseInteraction, EmbedBuilder, MessageCreateOptions, userMention } from 'discord.js'
+import { ActionRowBuilder, BaseInteraction, Colors, EmbedBuilder, MessageCreateOptions, userMention } from 'discord.js'
 import { ButtonBuilder } from '@discordjs/builders'
 
 import EventData from '../interfaces/EventData'
 
+/*
+     DESC: Creates formatted string of user mentions.
+      PRE: All ids are valid.
+    PARAM: ids - An array of Discord ids.
+      POST: Returns formatted string.
+*/
 const printNames = (ids: string[]): string => {
     const names: string = ids.map((id: string): string => {
         return `> ${userMention(id)}`;
@@ -11,9 +17,17 @@ const printNames = (ids: string[]): string => {
     return names ? names : '> -';
 }
 
+/*
+     DESC: Displays event information to user with interactive attendance buttons.
+      PRE: The event is valid.
+    PARAM: i - Generic interaction.
+    PARAM: event - Data from the event.
+     POST: Returns embed.
+*/
 const eventEmbed = (i: BaseInteraction, event: EventData): MessageCreateOptions => {
     const embed: EmbedBuilder = new EmbedBuilder()
         .setTitle(`:calendar_spiral: **${event.title}**`)
+        .setColor(Colors.Green)
         .setDescription(event.description ? event.description : null)
         .addFields(
             { 
@@ -37,13 +51,14 @@ const eventEmbed = (i: BaseInteraction, event: EventData): MessageCreateOptions 
             }
         )
         .setImage(event.image ? event.image : null)
-        .setFooter({ text: `Created by ${i.client.users.cache.get(event.creatorId).globalName}` });
+        .setFooter({ text: `⚙️ Settings | Created by ${i.client.users.cache.get(event.creatorId).globalName}` });
 
     const buttons: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 require('../buttons/attend'), 
                 require('../buttons/maybe'), 
-                require('../buttons/pass')
+                require('../buttons/pass'),
+                require('../buttons/eventsettings')
             );
 
     return {
