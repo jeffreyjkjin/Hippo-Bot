@@ -1,7 +1,9 @@
+import dayjs from 'dayjs'
 import { ChatInputCommandInteraction, InteractionReplyOptions, InteractionResponse } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
 import eventEmbed from '../embeds/eventembed'
+import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import Command from '../structures/Command'
 import ExtendedClient from '../structures/ExtendedClient'
@@ -40,19 +42,17 @@ module.exports = new Command(
     */
     async (i: ChatInputCommandInteraction) => {
         // only allow use of this command in regular text channels in guild
-        if (!i.channel) {
-            await i.reply({
-                content: 'This command can only be used in a server.',
-                ephemeral: true
-            });
+        if (i.channelId) {
+            await i.reply(messageEmbed(
+                'This command can only be used in a server.'
+            ) as InteractionReplyOptions);
             return;
         }
 
         if (i.channel.isThread() || i.channel.isVoiceBased()) {
-            await i.reply({
-                content: 'This command can only be used in a regular text channel.',
-                ephemeral: true
-            });
+            await i.reply(messageEmbed(
+                'This command can only be used in a regular text channel.'
+            ) as InteractionReplyOptions);
             return;
         }
 
@@ -76,22 +76,30 @@ module.exports = new Command(
             await i.showModal(eventModal('createevent', event));
             return;
         }
+
+        event.datetime = dayjs(event.datetime).second(0).millisecond(0).toISOString();
         
+        // check if time is valid
+        try {
+            event.datetime = parseDate(event.datetime);
+        }
+        catch (e: any) {
+            i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
+            return;
+        }
+
         // insert event into db and create event embed post
         const client: ExtendedClient = i.client as ExtendedClient;
         try {
-            event.datetime = parseDate(event.datetime);
-            
             const message: InteractionResponse = await i.reply(eventEmbed(i, event) as InteractionReplyOptions);
             event.messageUrl = (await message.fetch()).url;
 
             await client.mongo.db('Events').collection<EventData>(i.guild.id).insertOne(event);
         }
         catch (e: any) {
-            await i.reply({ 
-                content: e.toString(), 
-                ephemeral: true
-            });
+            await i.reply(messageEmbed(
+                'This event could not be created.'
+            ) as InteractionReplyOptions);
         }
     }
 );
