@@ -5,6 +5,7 @@ import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import ExtendedClient from '../structures/ExtendedClient'
 import Modal from '../structures/Modal'
+import checkImage from '../utils/checkimage'
 import eventModal from '../utils/eventmodal'
 import parseDate from '../utils/parsedate'
 
@@ -34,6 +35,18 @@ module.exports = new Modal(
             return;
         }
 
+
+        // check if image is valid
+        if (image) {
+            try {
+                checkImage(image);
+            }
+            catch (e: any) {
+                i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
+                return;
+            }
+        }
+        
         // update event and edit previous event embed post
         try {
             // update event

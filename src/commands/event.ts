@@ -1,5 +1,4 @@
-import dayjs from 'dayjs'
-import { ChatInputCommandInteraction, InteractionReplyOptions, InteractionResponse } from 'discord.js'
+import { ChannelType, ChatInputCommandInteraction, InteractionReplyOptions, InteractionResponse } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
 import eventEmbed from '../embeds/eventembed'
@@ -8,6 +7,7 @@ import EventData from '../interfaces/EventData'
 import Command from '../structures/Command'
 import ExtendedClient from '../structures/ExtendedClient'
 import eventModal from '../utils/eventmodal'
+import checkImage from '../utils/checkimage'
 import parseDate from '../utils/parsedate'
 
 module.exports = new Command(
@@ -42,14 +42,14 @@ module.exports = new Command(
     */
     async (i: ChatInputCommandInteraction) => {
         // only allow use of this command in regular text channels in guild
-        if (i.channelId) {
+        if (!i.channel) {
             await i.reply(messageEmbed(
                 'This command can only be used in a server.'
             ) as InteractionReplyOptions);
             return;
         }
 
-        if (i.channel.isThread() || i.channel.isVoiceBased()) {
+        if (i.channel.type !== ChannelType.GuildText) {
             await i.reply(messageEmbed(
                 'This command can only be used in a regular text channel.'
             ) as InteractionReplyOptions);
@@ -77,8 +77,6 @@ module.exports = new Command(
             return;
         }
 
-        event.datetime = dayjs(event.datetime).second(0).millisecond(0).toISOString();
-        
         // check if time is valid
         try {
             event.datetime = parseDate(event.datetime);
@@ -86,6 +84,17 @@ module.exports = new Command(
         catch (e: any) {
             i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
             return;
+        }
+
+        // check if image is valid
+        if (event.image) {
+            try {
+                checkImage(event.image);
+            }
+            catch (e: any) {
+                i.reply(messageEmbed(e.toString()) as InteractionReplyOptions);
+                return;
+            }
         }
 
         // insert event into db and create event embed post
