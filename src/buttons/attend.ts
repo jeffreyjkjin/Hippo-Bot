@@ -1,8 +1,9 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions } from 'discord.js'
+import { ButtonInteraction, ButtonStyle, InteractionReplyOptions, InteractionUpdateOptions } from 'discord.js'
 import { ButtonBuilder } from '@discordjs/builders'
 
 import attendEmbed from '../embeds/attendembed'
 import eventEmbed from '../embeds/eventembed'
+import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import Button from '../structures/Button'
 import ExtendedClient from '../structures/ExtendedClient'
@@ -27,32 +28,45 @@ module.exports = new Button(
                 messageUrl: i.message.url 
             });
 
-            // don't do anything if event has started
+            // check if event has started
             if (event.started) {
-                i.update({});
+                i.reply(messageEmbed('You cannot attend an event that has already started.') as InteractionReplyOptions);
                 return;
             }
 
-            // move user to attendees
-            await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
-                { messageUrl: i.message.url },
-                {
-                    $push: { 
-                        attendees: i.user.id 
-                    },
-                    $pull: {
-                        maybe: i.user.id,
-                        pass: i.user.id
+            // remove user from attendees if they're already in it
+            if (event.attendees.includes(i.user.id)) {
+                await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
+                    { messageUrl: i.message.url },
+                    {
+                        $pull: { attendees: i.user.id }
                     }
-                }
-            );
-
-            // fetch updated event, update event post, and dm user with event confirmation
+                );
+            }
+            else {
+                // move user to attendees
+                await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
+                    { messageUrl: i.message.url },
+                    {
+                        $push: { 
+                            attendees: i.user.id 
+                        },
+                        $pull: {
+                            maybe: i.user.id,
+                            pass: i.user.id
+                        }
+                    }
+                );
+                
+                // dm user with event confirmation
+                await i.user.send(attendEmbed(event));
+            }
+            
+            // fetch updated event and update the event post
             const updatedEvent: EventData = await client.mongo.db('Events').collection<EventData>(i.guild.id).findOne({
                 messageUrl: i.message.url 
             });
             await i.update(eventEmbed(i, updatedEvent) as InteractionUpdateOptions);
-            await i.user.send(attendEmbed(updatedEvent));
         }
         catch (e: any) {
             throw Error();

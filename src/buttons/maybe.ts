@@ -1,7 +1,8 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions } from 'discord.js'
+import { ButtonInteraction, ButtonStyle, InteractionReplyOptions, InteractionUpdateOptions } from 'discord.js'
 import { ButtonBuilder } from '@discordjs/builders'
 
 import eventEmbed from '../embeds/eventembed'
+import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
 import Button from '../structures/Button'
 import ExtendedClient from '../structures/ExtendedClient'
@@ -26,25 +27,38 @@ module.exports = new Button(
                 messageUrl: i.message.url 
             });
 
-            // don't do anything if event has started
+            // check if event has started
             if (event.started) {
-                i.update({});
+                i.reply(messageEmbed(
+                    'You cannot join the maybe list for an event that has already started.'
+                ) as InteractionReplyOptions);
                 return;
             }
 
-            // move user to maybe
-            await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
-                { messageUrl: i.message.url },
-                {
-                    $push: { 
-                        maybe: i.user.id 
-                    },
-                    $pull: {
-                        attendees: i.user.id,
-                        pass: i.user.id
+            // remove user from maybe list if they're already in it
+            if (event.maybe.includes(i.user.id)) {
+                await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
+                    { messageUrl: i.message.url },
+                    {
+                        $pull: { maybe: i.user.id }
                     }
-                }
-            );
+                );
+            }
+            else {
+                // move user to maybe
+                await client.mongo.db('Events').collection<EventData>(i.guild.id).updateOne(
+                    { messageUrl: i.message.url },
+                    {
+                        $push: { 
+                            maybe: i.user.id 
+                        },
+                        $pull: {
+                            attendees: i.user.id,
+                            pass: i.user.id
+                        }
+                    }
+                );
+            }
 
             // fetch updated event and update event post
             const updatedEvent: EventData = await client.mongo.db('Events').collection<EventData>(i.guild.id).findOne({
