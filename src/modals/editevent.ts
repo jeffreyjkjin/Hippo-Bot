@@ -35,7 +35,6 @@ module.exports = new Modal(
             return;
         }
 
-
         // check if image is valid
         if (image) {
             try {

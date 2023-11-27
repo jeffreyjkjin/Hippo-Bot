@@ -21,6 +21,7 @@ const eventModal = (id: string, event?: EventData): ModalBuilder => {
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('My awesome event.')
         .setValue((event && event.title) || '')
+        .setMaxLength(256)
         .setRequired(true);
         
     const datetime: TextInputBuilder = new TextInputBuilder()
@@ -37,6 +38,7 @@ const eventModal = (id: string, event?: EventData): ModalBuilder => {
         .setStyle(TextInputStyle.Paragraph)
         .setPlaceholder('An epic event for epic gamers.')
         .setValue((event && event.description) || '')
+        .setMaxLength(3072)
         .setRequired(false);
     
     const image: TextInputBuilder = new TextInputBuilder()

@@ -17,12 +17,14 @@ module.exports = new Command(
         .addStringOption((option) => {
             return option
                 .setName('title')
-                .setDescription('What is your event called? (i.e., My awesome event)');
+                .setDescription('What is your event called? (i.e., My awesome event)')
+                .setMaxLength(256);
         })
         .addStringOption((option) => {
             return option
                 .setName('datetime')
-                .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)');
+                .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)')
+                .setMaxLength(3072);
         })
         .addStringOption((option) => {
             return option
