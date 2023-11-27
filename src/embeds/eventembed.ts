@@ -10,9 +10,14 @@ import EventData from '../interfaces/EventData'
       POST: Returns formatted string.
 */
 const printNames = (ids: string[]): string => {
-    const names: string = ids.map((id: string): string => {
-        return `> ${userMention(id)}`;
-    }).toString().replaceAll(',', '\n');
+    let names: string = '';
+    ids.forEach((id: string) => {
+        const user: string = `> ${userMention(id)}`;
+        // only 768 characters allowed for each attendee, maybe, and pass fields
+        if (names.length + user.length + 2 <= 768) {
+            names += '\n' + user;
+        }
+    });
 
     return names ? names : '> -';
 }

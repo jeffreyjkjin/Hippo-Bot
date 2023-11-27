@@ -14,9 +14,14 @@ const startEventEmbed = (event: EventData): MessageCreateOptions => {
         .setColor(Colors.Green)
         .setDescription(`[Event Details](${event.messageUrl})`);
 
-    const attendees: string = event.attendees.map((id: string): string => {
-        return userMention(id);
-    }).toString();
+    let attendees: string = '';
+    event.attendees.map((id: string) => {
+        const user: string = userMention(id);
+        // list of attendees must be shorter than discord message limit
+        if (attendees.length + user.length <= 2000) {
+            attendees += user;
+        }
+    });
     
     return { 
         content: attendees,
