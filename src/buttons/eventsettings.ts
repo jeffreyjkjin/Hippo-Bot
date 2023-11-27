@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, InteractionReplyOptions } from "discord.js"
+import { ButtonInteraction, ButtonStyle, InteractionReplyOptions, PermissionsBitField } from "discord.js"
 import { ButtonBuilder } from "@discordjs/builders"
 
 import eventSettingsEmbed from "../embeds/eventsettingsembed"
@@ -20,13 +20,15 @@ module.exports = new Button(
                 messageUrl: i.message.url 
             });
 
-            if (event.started) {
-                await i.reply(messageEmbed('You cannot edit an event that has started.') as InteractionReplyOptions);
+            // only let event creator or admins to modify event
+            if (i.user.id != event.creatorId && !i.memberPermissions.has(PermissionsBitField.Flags.Administrator)) {
+                await i.reply(messageEmbed('You do not have permission to edit this event.') as InteractionReplyOptions)
                 return;
             }
-
-            if (i.user.id != event.creatorId) {
-                await i.reply(messageEmbed('You do not have permission to edit this event.') as InteractionReplyOptions)
+            
+            // check if event started
+            if (event.started) {
+                await i.reply(messageEmbed('You cannot edit an event that has started.') as InteractionReplyOptions);
                 return;
             }
 
