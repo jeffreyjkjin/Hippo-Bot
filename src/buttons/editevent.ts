@@ -1,4 +1,6 @@
 import dayjs from "dayjs"
+import advanceFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
 import { ButtonInteraction, ButtonStyle } from "discord.js"
 import { ButtonBuilder } from "@discordjs/builders"
 
@@ -7,18 +9,21 @@ import Button from "../structures/Button"
 import ExtendedClient from "../structures/ExtendedClient"
 import eventModal from "../utils/eventmodal"
 
+dayjs.extend(advanceFormat);
+dayjs.extend(timezone);
+
 module.exports = new Button(
     new ButtonBuilder()
-        .setCustomId('editevent')
-        .setEmoji({ name: '📝' })
-        .setStyle(ButtonStyle.Secondary),
+    .setCustomId('editevent')
+    .setEmoji({ name: '📝' })
+    .setStyle(ButtonStyle.Secondary),
     /*
-         DESC: Allows user to edit an event.
-          PRE: The event exists and is valid.
+        DESC: Allows user to edit an event.
+        PRE: The event exists and is valid.
         PARAM: i - Interaction from button press.
-         POST: The event is moved to the user's EditEvent collection and a modal to edit the event is displayed.
+        POST: The event is moved to the user's EditEvent collection and a modal to edit the event is displayed.
     */
-    async (i: ButtonInteraction) => {
+   async (i: ButtonInteraction) => {
         const client: ExtendedClient = i.client as ExtendedClient;
         const messageUrl: string = i.message.embeds[0].description.split('(').at(-1).slice(0, -2);
         
@@ -28,7 +33,7 @@ module.exports = new Button(
             });
 
             // convert time to be readable
-            event.datetime = dayjs(event.datetime, 'MMMM D YYYY h:mm A Z').toString();
+            event.datetime = dayjs(event.datetime).format('MMMM D YYYY h:mm A z');
 
             // only one event should be in each user's EditEvent collection
             if (await client.mongo.db('EditEvent').collection<EventData>(i.user.id).countDocuments() > 0) {
