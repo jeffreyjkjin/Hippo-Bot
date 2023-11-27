@@ -1,4 +1,4 @@
-import { MessageCreateOptions } from "discord.js"
+import { Colors, MessageCreateOptions } from "discord.js"
 import { EmbedBuilder } from "@discordjs/builders"
 
 import EventData from "../interfaces/EventData"
@@ -12,6 +12,7 @@ import EventData from "../interfaces/EventData"
 const attendEmbed = (event: EventData): MessageCreateOptions => {
     const embed: EmbedBuilder = new EmbedBuilder()
         .setTitle('**Attendee Confirmation**')
+        .setColor(Colors.Green)
         .setDescription(
             `You have joined the :white_check_mark: __Attendees__ list for [**${event.title}**](${event.messageUrl})!`
         )
