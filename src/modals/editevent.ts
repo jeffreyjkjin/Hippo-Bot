@@ -81,7 +81,7 @@ module.exports = new Modal(
             updatedEvent.attendees.forEach(async (id: string) => {
                 const attendee: User = await client.users.fetch(id);
                 await attendee.send(editEventEmbed(i, event, updatedEvent));
-            })
+            });
         }
         catch (e: any) {
             await i.reply(messageEmbed(

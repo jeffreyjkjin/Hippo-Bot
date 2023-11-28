@@ -1,6 +1,7 @@
-import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message } from "discord.js"
+import { ButtonInteraction, ButtonStyle, InteractionUpdateOptions, Message, User } from "discord.js"
 import { ButtonBuilder } from "@discordjs/builders"
 
+import deleteEventEmbed from "../embeds/deleteeventembed"
 import messageEmbed from "../embeds/messageembed"
 import EventData from "../interfaces/EventData"
 import Button from "../structures/Button"
@@ -34,6 +35,12 @@ module.exports = new Button(
             await client.mongo.db(i.guildId).collection<EventData>('Events').deleteOne(event);
             
             await i.update(messageEmbed(`**${event.title}** has been deleted.`) as InteractionUpdateOptions);
+
+            // dm attendees that event has been deleted
+            event.attendees.forEach(async (id: string) => {
+                const attendee: User = await client.users.fetch(id);
+                await attendee.send(deleteEventEmbed(i, event));
+            });
         }
         catch (e: any) {
             throw Error();
