@@ -1,5 +1,6 @@
-import { InteractionReplyOptions, Message, MessageEditOptions, ModalSubmitInteraction } from 'discord.js'
+import { InteractionReplyOptions, Message, MessageEditOptions, ModalSubmitInteraction, User } from 'discord.js'
 
+import editEventEmbed from '../embeds/editeventembed'
 import eventEmbed from '../embeds/eventembed'
 import messageEmbed from '../embeds/messageembed'
 import EventData from '../interfaces/EventData'
@@ -46,7 +47,6 @@ module.exports = new Modal(
             }
         }
         
-        // update event and edit previous event embed post
         try {
             // update event
             const event: EventData = await client.mongo.db('EditEvent').collection<EventData>(i.user.id).findOne({});
@@ -76,6 +76,12 @@ module.exports = new Modal(
             await i.reply(messageEmbed(
                 `[**${updatedEvent.title}**](${updatedEvent.messageUrl}) has been updated.`
             ) as InteractionReplyOptions);
+
+            // dm attendees that event has been edited
+            updatedEvent.attendees.forEach(async (id: string) => {
+                const attendee: User = await client.users.fetch(id);
+                await attendee.send(editEventEmbed(i, event, updatedEvent));
+            })
         }
         catch (e: any) {
             await i.reply(messageEmbed(
