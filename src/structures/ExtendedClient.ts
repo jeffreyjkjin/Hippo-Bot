@@ -43,7 +43,7 @@ export default class ExtendedClient extends Client {
     private loadCommands() {
         const commandPath: string = path.join(__dirname, '../commands');
         const commandFiles: string[] = fs.readdirSync(commandPath).filter((file: string): boolean => { 
-            return file.endsWith('.ts' || '.js'); 
+            return file.endsWith('.ts') || file.endsWith('.js'); 
         });
 
         commandFiles.forEach((file: string) => {
@@ -80,7 +80,7 @@ export default class ExtendedClient extends Client {
     private async loadButtons() {
         const buttonPath: string = path.join(__dirname, '../buttons');
         const buttonFiles: string[] = fs.readdirSync(buttonPath).filter((file: string): boolean => { 
-            return file.endsWith('.ts' || '.js'); 
+            return file.endsWith('.ts') || file.endsWith('.js'); 
         });
 
         buttonFiles.forEach((file: string) => {
@@ -95,7 +95,7 @@ export default class ExtendedClient extends Client {
     private async loadModals() {
         const modalPath: string = path.join(__dirname, '../modals');
         const modalFiles: string[] = fs.readdirSync(modalPath).filter((file: string): boolean => { 
-            return file.endsWith('.ts' || '.js'); 
+            return file.endsWith('.ts') || file.endsWith('.js'); 
         });
 
         modalFiles.forEach((file: string) => {
@@ -122,7 +122,7 @@ export default class ExtendedClient extends Client {
     private async loadEvents() {
         const eventPath: string = path.join(__dirname, '../events');
         const eventFiles: string[] = fs.readdirSync(eventPath).filter((file: string): boolean => { 
-            return file.endsWith('.ts' || '.js'); 
+            return file.endsWith('.ts') || file.endsWith('.js'); 
         });
 
         eventFiles.forEach((file: string) => {
