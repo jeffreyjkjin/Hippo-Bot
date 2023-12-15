@@ -31,8 +31,8 @@ module.exports = new Button(
             // fetch event post and delete it
             const eventPost: Message = await i.channel.messages.fetch(messageUrl.split('/').at(-1));
             await i.channel.messages.delete(eventPost);
- 
-            await client.mongo.db(i.guildId).collection<EventData>('Events').deleteOne(event);
+
+            await client.mongo.db('Events').collection<EventData>(i.guildId).deleteOne(event);
             
             await i.update(messageEmbed(`**${event.title}** has been deleted.`) as InteractionUpdateOptions);
 
