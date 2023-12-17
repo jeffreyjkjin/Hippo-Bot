@@ -1,5 +1,5 @@
 import { ChannelType, ChatInputCommandInteraction, InteractionReplyOptions, InteractionResponse } from 'discord.js'
-import { SlashCommandBuilder } from '@discordjs/builders'
+import { SlashCommandBuilder, SlashCommandStringOption } from '@discordjs/builders'
 
 import eventEmbed from '../embeds/eventembed'
 import messageEmbed from '../embeds/messageembed'
@@ -14,24 +14,24 @@ module.exports = new Command(
     new SlashCommandBuilder()
         .setName('event')
         .setDescription('Creates a new event.')
-        .addStringOption((option) => {
+        .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('title')
                 .setDescription('What is your event called? (i.e., My awesome event)')
                 .setMaxLength(256);
         })
-        .addStringOption((option) => {
+        .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('datetime')
                 .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)')
                 .setMaxLength(3072);
         })
-        .addStringOption((option) => {
+        .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('description')
                 .setDescription('What is your event about? (i.e., An epic event for epic gamers.)');
         })
-        .addStringOption((option) => {
+        .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('image')
                 .setDescription('Add an image to your event. (i.e., https://i.imgur.com/w8as1S9.png)');
