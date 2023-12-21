@@ -1,6 +1,7 @@
 import { BaseInteraction, Colors, EmbedBuilder, MessageCreateOptions } from 'discord.js'
 
 import PollData from '../interfaces/PollData'
+import getPollSymbol from '../utils/getpollsymbol'
 
 /*
      DESC: Displays poll options and buttons to allow user to vote.
@@ -32,7 +33,7 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
     }
             
     let count: number = 0;
-    let symbol: string = !poll.ended ? ':regional_indicator_a:' : ':first_place:';
+    let symbol: string = !poll.ended ? getPollSymbol(0) : ':first_place:';
             
     // generate poll options
     poll.options.forEach((voters: string[], option: string) => {
@@ -47,17 +48,17 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
         });
 
         // update symbol to next letter
+        count++;
         if (!poll.ended) {
-            symbol = symbol.slice(0, 20) + String.fromCodePoint(symbol.slice(20, 21).charCodeAt(0)+1) + ':'; 
+            symbol = getPollSymbol(count); 
         }
-        else if (count < 3) {
+        else {
             if (count === 1) { 
                 symbol = ':second_place:'
             }
             else if (count === 2) {
                 symbol = ':third_place:'
             }
-            count++;
         }
     });
     
