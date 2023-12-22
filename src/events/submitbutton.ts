@@ -17,8 +17,16 @@ module.exports = new Event(
    async (i: BaseInteraction) => {
         if (i.isButton()) {
             const client: ExtendedClient = i.client as ExtendedClient;
-            const button: Button = client.buttons.get(i.customId);
-        
+
+            let button: Button;
+            if (i.customId.slice(0, 4) === 'vote') {
+                // vote button has their associated option appended to the end
+                button = client.buttons.get('vote');
+            }
+            else { 
+                button = client.buttons.get(i.customId);
+            }
+
             if (!button) {
                 await i.followUp(messageEmbed(
                     `No button matching ${i.customId} was found.`
