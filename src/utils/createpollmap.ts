@@ -14,6 +14,10 @@ const createPollMap = (options: string): Map<string, Array<string>> => {
     });
 
     parsedOptions.forEach((option: string) => {
+        if (option.length > 255) {
+            throw `${option} exceeds the character limit.`;
+        }
+
         map.set(option, []);
     });
 
