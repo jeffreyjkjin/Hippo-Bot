@@ -1,5 +1,5 @@
-import { ActionRowBuilder, BaseInteraction, Colors, EmbedBuilder, MessageCreateOptions, userMention } from 'discord.js'
-import { ButtonBuilder } from '@discordjs/builders'
+import { BaseInteraction, Colors, EmbedBuilder, MessageCreateOptions, userMention } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders'
 
 import EventData from '../interfaces/EventData'
 
@@ -58,13 +58,17 @@ const eventEmbed = (i: BaseInteraction, event: EventData): MessageCreateOptions 
         .setImage(event.image ? event.image : null)
         .setFooter({ text: `⚙️ Settings | Created by ${i.client.users.cache.get(event.creatorId).globalName}` });
 
-    const buttons: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
-                require('../buttons/attend'), 
-                require('../buttons/maybe'), 
-                require('../buttons/pass'),
-                require('../buttons/eventsettings')
-            );
+    const buttons: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>();
+    
+    // only show buttons if event has not started
+    if (!event.started) {
+        buttons.addComponents(
+            require('../buttons/attend'), 
+            require('../buttons/maybe'), 
+            require('../buttons/pass'),
+        );
+    }
+    buttons.addComponents(require('../buttons/eventsettings'));
 
     return {
         embeds: [embed],
