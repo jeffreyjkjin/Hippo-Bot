@@ -14,16 +14,11 @@ const pollSymbols: Map<number, string> = new Map([
     [13, '🇴'],
     [14, '🇲'],
     [15, '🇳'],
-    [16, '🇵'],
-    [17, '🇶'],
-    [18, '🇷'],
-    [19, '🇸'],
-    [20, '🇹']
 ]);
 
 /*
      DESC: Retrieves regional indicator at a given index.
-      PRE: optionNum is between 1-20.
+      PRE: optionNum is between 1-15.
     PARAM: optionNum - The number of the option.
      POST: Returns symbol.
 */
