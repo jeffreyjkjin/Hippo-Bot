@@ -15,7 +15,9 @@ import voteButton from '../utils/votebutton'
 const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => {
     const creator: string = i.client.users.cache.get(poll.creatorId).globalName;
 
-    const singleVote = `${!poll.singleVote ? 'You may vote for multiple options in this poll.' : ''}`;
+    const singleVote = `${!poll.singleVote ? 
+        'You may vote for multiple options in this poll.' : 
+        'You may select only one option in this poll'}`;
     const addOptions = `${poll.addOptions && poll.options.size < 15 ? '➕ Add Option | ' : ''}`;
 
     const embed: EmbedBuilder = new EmbedBuilder()
@@ -77,7 +79,7 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
         const voteSquares: number = voters.length ? Math.round(10 * (voters.length/poll.totalVotes)) : 0;
         const voteBar: string = ':white_large_square:'.repeat(voteSquares);
         const emptyBar: string = ':black_large_square:'.repeat(10 - voteSquares);
-        const percentage: number = voters.length ? Math.round(voters.length/poll.totalVotes * 100)/100 : 0;
+        const percentage: number = voters.length ? Math.round(voters.length/poll.totalVotes * 10000)/100 : 0;
         
         embed.addFields({
             name: `${symbol} ${option}`,

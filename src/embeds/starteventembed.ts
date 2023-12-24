@@ -18,8 +18,8 @@ const startEventEmbed = (event: EventData): MessageCreateOptions => {
     event.attendees.map((id: string) => {
         const user: string = userMention(id);
         // list of attendees must be shorter than discord message limit
-        if (attendees.length + user.length <= 2000) {
-            attendees += user;
+        if (attendees.length + user.length + 1 <= 2000) {
+            attendees += `${user} `;
         }
     });
     
