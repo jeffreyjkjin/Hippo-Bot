@@ -49,6 +49,25 @@ const voteButton = (option?: string, optionNum?: number): Button => {
                     );                    
                 }
                 else {
+                    // find which option user has voted for previously
+                    if (poll.singleVote) {
+                        // convert options object back into a map
+                        poll.options = new Map(Object.entries(poll.options));
+                        
+                        for (const [option, voters] of poll.options.entries() as IterableIterator<[string, string[]]>) {
+                            if (voters.includes(i.user.id)) {
+                                await client.mongo.db('Polls').collection<PollData>(i.guild.id).updateOne(
+                                    { messageUrl: i.message.url },
+                                    {
+                                        $pull: { [`options.${option}`]: i.user.id },
+                                        $inc: { totalVotes: -1 }
+                                    }
+                                );
+                                break;
+                            }
+                        }
+                    }
+
                     // add users vote to option
                     await client.mongo.db('Polls').collection<PollData>(i.guild.id).updateOne(
                         { messageUrl: i.message.url },
