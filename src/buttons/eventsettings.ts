@@ -9,7 +9,7 @@ import ExtendedClient from "../structures/ExtendedClient"
 
 module.exports = new Button(
     new ButtonBuilder()
-        .setCustomId('eventSettings')
+        .setCustomId('eventsettings')
         .setEmoji({ name: '⚙️' })
         .setStyle(ButtonStyle.Secondary),
     async (i: ButtonInteraction) => {
