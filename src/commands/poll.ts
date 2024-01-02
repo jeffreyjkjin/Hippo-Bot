@@ -8,6 +8,7 @@ import Command from "../structures/Command"
 import ExtendedClient from "../structures/ExtendedClient"
 import checkImage from "../utils/checkimage"
 import createPollMap from "../utils/createpollmap"
+import pollModal from "../utils/pollmodal"
 
 module.exports = new Command(
     new SlashCommandBuilder()
@@ -16,7 +17,7 @@ module.exports = new Command(
         .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('title')
-                .setDescription('What is your poll called? (i.e., My awesome poll)')
+                .setDescription('What is your poll called? (i.e., My awesome poll.)')
                 .setMaxLength(256);
         })
         .addStringOption((option: SlashCommandStringOption) => {
@@ -28,7 +29,7 @@ module.exports = new Command(
         .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('description')
-                .setDescription('What is your poll about? (i.e., This poll is for epic gamers.)')
+                .setDescription('What is your poll about? (i.e., A poll for epic gamers.)')
                 .setMaxLength(1024);
         })
         .addStringOption((option: SlashCommandStringOption) => {
@@ -80,6 +81,16 @@ module.exports = new Command(
             messageUrl: null,
             creatorId: i.user.id,
             ended: false
+        }
+
+        // display modal if not all required fields were given
+        if (!poll.title || !i.options.getString('options')) {
+            if (i.options.getString('options')) {
+                // if user entered options, set the string to the first entry of the options map
+                poll.options = new Map<string, string[]>([[i.options.getString('options'), []]]);
+            }
+            await i.showModal(pollModal('createpoll', poll));
+            return;
         }
 
         // check if options are valid
