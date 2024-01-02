@@ -62,7 +62,7 @@ module.exports = new Modal(
         }
         catch (e: any) {
             await i.reply(messageEmbed(
-                'This event could not be created.'
+                'This poll could not be created.'
             ) as InteractionReplyOptions);
         }
     }
