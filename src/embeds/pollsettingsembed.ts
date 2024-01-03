@@ -32,8 +32,8 @@ const pollSettingsEmbed = (poll: PollData): MessageCreateOptions => {
         .addComponents(
             require('../buttons/editpoll'),
             require('../buttons/singlevote'),
-            require('../buttons/endpoll'),
             require('../buttons/toggleaddoptions'),
+            require('../buttons/endpoll'),
             require('../buttons/deletepoll')
         );
 
