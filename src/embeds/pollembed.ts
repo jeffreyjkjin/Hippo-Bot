@@ -14,12 +14,12 @@ import voteButton from '../utils/votebutton'
 */
 const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => {
     const creator: string = i.client.users.cache.get(poll.creatorId).globalName;
-
+    
     const singleVote = `${!poll.singleVote ? 
-        'You may vote for multiple options in this poll.' : 
+        'You may vote for multiple options in this poll' : 
         'You may select only one option in this poll'}`;
     const addOptions = `${poll.addOptions && poll.options.size < 15 ? '➕ Add Option | ' : ''}`;
-
+    
     const embed: EmbedBuilder = new EmbedBuilder()
         .setTitle(`📊 **${poll.title}**`)
         .setColor(Colors.Green)
@@ -28,7 +28,7 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
         .setFooter({ 
             text: `${singleVote}\n${addOptions}⚙️ Settings | Created by ${creator}` 
         });
-
+        
     // sort poll options by most votes if poll is over
     if (poll.ended) {
         poll.options = new Map(
@@ -37,7 +37,7 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
             })
         );        
     }
-    
+        
     // initalize rows of buttons (grid will be up to 5x4)
     const buttonRows: ActionRowBuilder<ButtonBuilder>[] = [new ActionRowBuilder<ButtonBuilder>()];
     let rowNum: number = 0;
@@ -64,15 +64,17 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
         }
         else {
             // set symbol for top 3 most voted options
-            if (optionNum === 0) {
-                symbol = ':first_place:';
+            if (optionNum === 1) {
+                symbol = ':first_place: ';
             }
-            if (optionNum === 1) { 
-                symbol = ':second_place:';
+            if (optionNum === 2) { 
+                symbol = ':second_place: ';
             }
-            else if (optionNum === 2) {
-                symbol = ':third_place:';
+            else if (optionNum === 3) {
+                symbol = ':third_place: ';
             }
+            else if (optionNum === 4)
+                symbol = '';
         }
         
         // calculate percentage bar for each option
@@ -88,6 +90,22 @@ const pollEmbed = (i: BaseInteraction, poll: PollData): MessageCreateOptions => 
         
         optionNum++;
     });
+
+
+    // add additional buttons
+    const extraButtons: string[] = ['../buttons/pollsettings']
+    poll.addOptions && poll.options.size < 15 && extraButtons.push('../buttons/addoption');
+
+    for (const button of extraButtons as [string]) {
+        if (buttonNum > 4) {
+            buttonNum = 0;
+            buttonRows.push(new ActionRowBuilder<ButtonBuilder>())
+            rowNum++;
+        }
+        
+        buttonRows[rowNum].addComponents(require(button));
+        buttonNum++;
+    }
 
     return {
         embeds: [embed],
