@@ -23,13 +23,13 @@ module.exports = new Command(
         .addStringOption((option: SlashCommandStringOption) => {
             return option
                 .setName('datetime')
-                .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)')
-                .setMaxLength(3072);
-        })
+                .setDescription('When is your event? (i.e., October 2, 2023 10:00 PM PST)');
+            })
         .addStringOption((option: SlashCommandStringOption) => {
             return option
-                .setName('description')
-                .setDescription('What is your event about? (i.e., An epic event for epic gamers.)');
+            .setName('description')
+            .setDescription('What is your event about? (i.e., An epic event for epic gamers.)')
+            .setMaxLength(3072);
         })
         .addStringOption((option: SlashCommandStringOption) => {
             return option
